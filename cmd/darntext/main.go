@@ -50,7 +50,7 @@ func main() {
 	interpreter := getInterpreter(bestConfig)
 
 	// 5. Execute the configuration file in the target directory with forwarded arguments
-	executeConfig(interpreter, bestConfig, configDir, targetPath, os.Args[1:])
+	executeConfig(interpreter, bestConfig, configDir, targetPath, initialDir, os.Args[1:])
 }
 
 // getRealCWD gets the absolute, symlink-resolved current working directory
@@ -187,7 +187,7 @@ func getInterpreter(filePath string) []string {
 }
 
 // executeConfig runs the matched configuration script with forwarded arguments
-func executeConfig(interpreter []string, configPath, configDir, targetDir string, args []string) {
+func executeConfig(interpreter []string, configPath, configDir, targetDir, initialDir string, args []string) {
 	cmdName := interpreter[0]
 
 	// Create arguments: e.g. ["/usr/bin/env", "bash", "/path/to/config.sh"]
@@ -215,6 +215,7 @@ func executeConfig(interpreter []string, configPath, configDir, targetDir string
 	// Configure the environment specifically for the spawned subprocess
 	env := os.Environ()
 	env = append(env, "DARNTEXT_CONFIG_DIR="+configDir)
+	env = append(env, "DARNTEXT_INITIAL_DIR="+initialDir)
 
 	// Locate lib.sh within the configuration directory
 	bashEnv := filepath.Join(configDir, "lib.sh")
